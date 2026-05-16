@@ -60,6 +60,7 @@ interface ForgeState {
   deleteInterviewQuestion: (id: string) => Promise<void>;
   toggleFavoriteInterviewQuestion: (id: string) => Promise<void>;
   seedIfEmpty: () => Promise<void>;
+  seedExtrasIfEmpty: () => Promise<void>;
 }
 
 export const useForge = create<ForgeState>()(
@@ -191,9 +192,12 @@ export const useForge = create<ForgeState>()(
               initialized: true
             });
 
-            // Seed if empty
+            // Full seed on a completely fresh account
             if (p.length === 0 && a.length === 0) {
               await get().seedIfEmpty();
+            } else if (conn.length === 0 || soc.length === 0 || mail.length === 0) {
+              // Existing account missing the newer asset types — seed only those
+              await get().seedExtrasIfEmpty();
             }
           }
         } catch (e) {
@@ -746,6 +750,67 @@ export const useForge = create<ForgeState>()(
           toast.success("Initial data synchronized!");
         } catch (e) {
           console.error("Seeding error:", e);
+        }
+      },
+
+      seedExtrasIfEmpty: async () => {
+        console.log("Seeding extras (connectors / social / mail)...");
+        const state = get();
+
+        const connectorsData = state.connectors.length === 0
+          ? seedConnectors.map(({ id, ...c }) => ({ ...c, user_id: 'local', id }))
+          : [];
+        const socialDraftsData = state.socialDrafts.length === 0
+          ? seedSocialDrafts.map(({ id, ...d }) => ({ ...d, media_urls: d.mediaUrls, user_id: 'local', id }))
+          : [];
+        const mailTemplatesData = state.mailTemplates.length === 0
+          ? seedMailTemplates.map(({ id, ...m }) => ({ ...m, user_id: 'local', id }))
+          : [];
+
+        try {
+          await Promise.all([
+            connectorsData.length > 0 ? db.upsertConnectors(connectorsData) : Promise.resolve([]),
+            socialDraftsData.length > 0 ? db.upsertSocialDrafts(socialDraftsData) : Promise.resolve([]),
+            mailTemplatesData.length > 0 ? db.upsertMailTemplates(mailTemplatesData) : Promise.resolve([]),
+          ]);
+
+          const [conn, soc, mail] = await Promise.all([
+            db.getConnectors(),
+            db.getSocialDrafts(),
+            db.getMailTemplates(),
+          ]);
+
+          set({
+            connectors: conn.map((x: any) => ({
+              id: x.id,
+              type: x.type,
+              name: x.name,
+              email: x.email || undefined,
+              phone: x.phone || undefined,
+              notes: x.notes || undefined,
+              createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
+              updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
+            })),
+            socialDrafts: soc.map((x: any) => ({
+              id: x.id,
+              platform: x.platform,
+              content: x.content,
+              mediaUrls: x.media_urls || [],
+              createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
+              updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
+            })),
+            mailTemplates: mail.map((x: any) => ({
+              id: x.id,
+              channel: x.channel,
+              subject: x.subject || undefined,
+              content: x.content,
+              createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
+              updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
+            })),
+          });
+          toast.success("Network & comms data ready!");
+        } catch (e) {
+          console.error("Extras seeding error:", e);
         }
       },
     }),
