@@ -7,14 +7,10 @@ import {
   FileText, Save, User, Briefcase, GraduationCap, Code2, FolderGit2, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import { useForge, newId } from "@/lib/store";
 import { CVSidebar } from "@/components/cv/cv-sidebar";
 import { CVBuilder } from "@/components/cv/cv-builder";
-import type { CVProfile, CVFocus } from "@/types/cv";
-import { FOCUS_LABELS } from "@/types/cv";
+import type { CVProfile } from "@/types/cv";
 
 export const Route = createFileRoute("/cv")({
   head: () => ({
@@ -24,12 +20,12 @@ export const Route = createFileRoute("/cv")({
 });
 
 const BUILDER_TABS = [
-  { id: "personal", label: "Personal", icon: User },
+  { id: "personal",   label: "Personal",   icon: User },
   { id: "experience", label: "Experience", icon: Briefcase },
-  { id: "skills", label: "Skills", icon: Code2 },
-  { id: "education", label: "Education", icon: GraduationCap },
-  { id: "projects", label: "Projects", icon: FolderGit2 },
-  { id: "ats", label: "ATS Check", icon: Sparkles },
+  { id: "skills",     label: "Skills",     icon: Code2 },
+  { id: "education",  label: "Education",  icon: GraduationCap },
+  { id: "projects",   label: "Projects",   icon: FolderGit2 },
+  { id: "ats",        label: "ATS Check",  icon: Sparkles },
 ] as const;
 
 type BuilderTab = typeof BUILDER_TABS[number]["id"];
@@ -70,11 +66,6 @@ function CVPage() {
     }
   }, [activeCVId, cvProfiles]);
 
-  const patch = <K extends keyof CVProfile>(key: K, value: CVProfile[K]) => {
-    if (!draft) return;
-    setDraft({ ...draft, [key]: value, updatedAt: Date.now() });
-  };
-
   const handleNewCV = () => {
     const id = newId("cv");
     const cv = defaultCV(id);
@@ -106,8 +97,9 @@ function CVPage() {
     <PageContainer>
       <PageSection>
         <PageHeader
+          icon={FileText}
           title="CV Builder"
-          description="Create tailored CVs for Frontend, Backend, and Fullstack roles. Check ATS compatibility before applying."
+          description="Create tailored CVs for each role and check ATS compatibility before applying."
           className="mb-4"
           actions={
             draft ? (
@@ -117,30 +109,6 @@ function CVPage() {
             ) : undefined
           }
         />
-
-        {/* CV-specific controls — only when a profile is selected */}
-        {draft && (
-          <div className="flex items-center gap-2 mb-4">
-            <input
-              type="text"
-              value={draft.title}
-              onChange={(e) => patch("title", e.target.value)}
-              placeholder="CV title (e.g. Frontend Engineer CV)"
-              className="flex-1 max-w-[260px] h-9 rounded-lg border border-input bg-muted/40 px-3 text-sm font-medium outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 transition-all"
-            />
-            <Select value={draft.focus} onValueChange={(v) => patch("focus", v as CVFocus)}>
-              <SelectTrigger className="w-36 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {(Object.keys(FOCUS_LABELS) as CVFocus[]).map((f) => (
-                  <SelectItem key={f} value={f}>{FOCUS_LABELS[f]}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-
         <TabNav
           tabs={BUILDER_TABS.map((t) => ({
             ...t,

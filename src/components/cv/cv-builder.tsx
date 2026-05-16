@@ -1,19 +1,23 @@
 import { User, Briefcase, GraduationCap, Code2, FolderGit2, Sparkles } from "lucide-react";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { CVPersonal } from "./cv-personal";
 import { CVExperienceSection } from "./cv-experience";
 import { CVSkillsSection } from "./cv-skills";
 import { CVEducationSection } from "./cv-education";
 import { CVProjectsSection } from "./cv-projects";
 import { ATSChecker } from "./ats-checker";
-import type { CVProfile } from "@/types/cv";
+import type { CVProfile, CVFocus } from "@/types/cv";
+import { FOCUS_LABELS } from "@/types/cv";
 
 const BUILDER_TABS = [
-  { id: "personal", label: "Personal", icon: User },
+  { id: "personal",   label: "Personal",   icon: User },
   { id: "experience", label: "Experience", icon: Briefcase },
-  { id: "skills", label: "Skills", icon: Code2 },
-  { id: "education", label: "Education", icon: GraduationCap },
-  { id: "projects", label: "Projects", icon: FolderGit2 },
-  { id: "ats", label: "ATS Check", icon: Sparkles },
+  { id: "skills",     label: "Skills",     icon: Code2 },
+  { id: "education",  label: "Education",  icon: GraduationCap },
+  { id: "projects",   label: "Projects",   icon: FolderGit2 },
+  { id: "ats",        label: "ATS Check",  icon: Sparkles },
 ] as const;
 
 type BuilderTab = typeof BUILDER_TABS[number]["id"];
@@ -30,6 +34,29 @@ export function CVBuilder({ cv, onUpdate, activeTab }: CVBuilderProps) {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
+
+      {/* Compact CV context bar — title input + focus select */}
+      <div className="shrink-0 border-b border-border/60 bg-muted/20 px-4 py-2 flex items-center gap-2">
+        <input
+          type="text"
+          value={cv.title}
+          onChange={(e) => patch("title", e.target.value)}
+          placeholder="CV title…"
+          className="flex-1 max-w-[220px] h-7 rounded-md border border-input bg-background/80 px-2.5 text-xs font-medium outline-none focus:ring-1 focus:ring-primary/30 focus:border-primary/40 transition-all placeholder:text-muted-foreground/50"
+        />
+        <Select value={cv.focus} onValueChange={(v) => patch("focus", v as CVFocus)}>
+          <SelectTrigger className="w-32 h-7 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(Object.keys(FOCUS_LABELS) as CVFocus[]).map((f) => (
+              <SelectItem key={f} value={f}>{FOCUS_LABELS[f]}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Content */}
       <div className="flex-1 overflow-hidden">
         {activeTab === "ats" ? (
           <div className="h-full overflow-y-auto scrollbar-thin">
