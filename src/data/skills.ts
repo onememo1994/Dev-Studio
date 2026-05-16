@@ -323,6 +323,18 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           title: "Stakeholder Translation",
           body: "Translate engineering jargon into business outcomes. 'Refactor' → 'reduces incident frequency'. 'Tech debt' → 'slowing feature velocity 30%'.",
         },
+        {
+          title: "1:1 Conversations",
+          body: "Show up with one topic, not a status report. Ask open questions ('what's draining you?'). Silence is a tool — let people finish their thought.",
+        },
+        {
+          title: "Disagree & Commit",
+          body: "State your objection once, clearly, with evidence. If the team chooses otherwise, commit fully — no sabotage, no 'I told you so'.",
+        },
+        {
+          title: "Written Standups",
+          body: "Yesterday / Today / Blockers — kept under 5 lines. Tag people you need from. Async beats a 30-minute meeting for 6 people.",
+        },
       ],
       resources: [
         {
@@ -334,6 +346,75 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           label: "Crucial Conversations",
           url: "https://cruciallearning.com/",
           desc: "Tools for talking when stakes are high.",
+        },
+        {
+          label: "Never Split the Difference",
+          url: "https://www.blackswanltd.com/",
+          desc: "Tactical empathy and negotiation by an ex-FBI hostage negotiator.",
+        },
+      ],
+    },
+    {
+      id: "speaking",
+      label: "Public Speaking",
+      icon: Mic,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["speaking", "presentations", "talks"],
+      concepts: [
+        {
+          title: "Open With a Hook",
+          body: "First 30 seconds decide whether the room listens. Start with a surprising number, a sharp question, or a 1-sentence story — never with 'My name is...'.",
+        },
+        {
+          title: "Rule of Three",
+          body: "Group ideas in threes: 3 problems, 3 reasons, 3 takeaways. The brain remembers triplets and forgets lists of seven.",
+        },
+        {
+          title: "Slow Down, Then Slow Down Again",
+          body: "Nerves push you to 1.5x speed. Mark deliberate pauses on your slides. A 2-second silence after a key point lands harder than any animation.",
+        },
+        {
+          title: "Demo Discipline",
+          body: "Record a backup video. Pre-stage data. Zoom your terminal to 18pt+. Never type a password on stage — paste from a notes file.",
+        },
+        {
+          title: "Q&A Without Panic",
+          body: "Repeat the question (buys time, helps the room). 'I don't know — I'll follow up' is a strong answer. Park hostile threads: 'great topic, let's chat after'.",
+        },
+      ],
+      resources: [
+        {
+          label: "Talk Like TED",
+          url: "https://www.ted.com/playlists",
+          desc: "Watch 3 talks in your domain, copy what works, drop what doesn't.",
+        },
+        {
+          label: "Presentation Zen",
+          url: "https://presentationzen.com/",
+          desc: "Slide design philosophy that kills bullet-heavy decks.",
+        },
+      ],
+    },
+    {
+      id: "negotiation",
+      label: "Negotiation",
+      icon: Handshake,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["negotiation", "influence"],
+      concepts: [
+        {
+          title: "Anchor First",
+          body: "Whoever names the first number shapes the range. Research market data, then open at the high end of reasonable.",
+        },
+        {
+          title: "Trade, Don't Concede",
+          body: "Never give without getting. 'I can do that deadline if scope drops feature X' beats 'sure, no problem'.",
+        },
+        {
+          title: "BATNA",
+          body: "Know your Best Alternative To a Negotiated Agreement. If you have no walk-away option, you're not negotiating — you're begging.",
         },
       ],
     },
@@ -352,6 +433,14 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           title: "Delegation",
           body: "Delegate outcomes, not steps. Give context, constraints, and a deadline. Trust the person to choose the path.",
         },
+        {
+          title: "Run Effective 1:1s",
+          body: "Their agenda first, yours second. Weekly cadence, 30 minutes. Notes in a shared doc you both edit — career, blockers, feedback.",
+        },
+        {
+          title: "Radical Candor",
+          body: "Care personally + challenge directly. Praise in public, critique in private, always specific and timely.",
+        },
       ],
       resources: [
         {
@@ -363,6 +452,11 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           label: "The Manager's Path",
           url: "https://www.oreilly.com/",
           desc: "Guide for tech leaders.",
+        },
+        {
+          label: "Radical Candor",
+          url: "https://www.radicalcandor.com/",
+          desc: "Kim Scott's framework for honest, caring feedback.",
         },
       ],
     },
@@ -381,6 +475,14 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           title: "5 Whys",
           body: "Ask 'why' five times to drive past symptoms to root cause. Pairs well with blameless post-mortems.",
         },
+        {
+          title: "Rubber Duck",
+          body: "Explain the problem out loud to a duck (or a colleague who isn't even listening). The act of verbalizing exposes the gap.",
+        },
+        {
+          title: "Inversion",
+          body: "Instead of 'how do I succeed?', ask 'what guarantees failure?' — then avoid those. Often a faster path to the answer.",
+        },
       ],
     },
     {
@@ -393,6 +495,14 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
         {
           title: "Psychological Safety",
           body: "Reward 'I don't know' and 'I was wrong'. Punish blame, not mistakes.",
+        },
+        {
+          title: "Assume Positive Intent",
+          body: "Default to 'they had a reason' instead of 'they're an idiot'. Ask before you assume — 90% of the time it's missing context, not malice.",
+        },
+        {
+          title: "Pair & Mob Programming",
+          body: "Two brains catch bugs and spread knowledge in real time. Rotate the driver every 15 minutes. Use it for the hardest problems, not the easiest.",
         },
       ],
     },
@@ -408,6 +518,14 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
           title: "Deep Work Blocks",
           body: "2–4 hour uninterrupted blocks for hard problems. No Slack, no meetings. Defend them ruthlessly.",
         },
+        {
+          title: "Eisenhower Matrix",
+          body: "Urgent + Important = do now. Important + Not urgent = schedule. Urgent + Not important = delegate. Neither = delete.",
+        },
+        {
+          title: "Say No (Politely)",
+          body: "Every yes is a no to something else. 'I can't take this on without dropping X — which would you rather?' protects priorities.",
+        },
       ],
     },
     {
@@ -421,6 +539,36 @@ export const SOFT_SKILLS_DATA: SkillAreaData = {
         {
           title: "Deliberate Practice",
           body: "Pick one weak area per quarter. Practice with feedback. Generic 'years of experience' is not skill.",
+        },
+        {
+          title: "Feedback as Fuel",
+          body: "Ask 'what's one thing I should do differently?' after every major project. Thank the giver, don't defend.",
+        },
+        {
+          title: "Teach to Learn",
+          body: "Write a blog post, give a brown-bag, or mentor a junior. Teaching forces you to confront what you only half-understand.",
+        },
+      ],
+    },
+    {
+      id: "mental-models",
+      label: "Mental Models",
+      icon: Brain,
+      color: "border-primary/40 bg-primary/10 text-primary",
+      accent: "border-primary/30",
+      tags: ["thinking", "models"],
+      concepts: [
+        {
+          title: "Second-Order Thinking",
+          body: "'And then what?' — the obvious fix often creates the next problem. Cheap shortcut today, expensive migration in 18 months.",
+        },
+        {
+          title: "Hanlon's Razor",
+          body: "Never attribute to malice that which is adequately explained by neglect, miscommunication, or a missed Slack message.",
+        },
+        {
+          title: "Chesterton's Fence",
+          body: "Before removing 'weird' code or process, find out why it exists. The ugly hack is often guarding a production fire you can't see.",
         },
       ],
     },
