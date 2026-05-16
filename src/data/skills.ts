@@ -12,6 +12,9 @@ import {
   Target,
   Sparkles,
   Heart,
+  Mic,
+  Handshake,
+  Brain,
 } from "lucide-react";
 
 export const TECH_AREAS: Record<TechAreaId, SkillAreaData> = {
