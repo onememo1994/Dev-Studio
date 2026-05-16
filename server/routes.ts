@@ -17,6 +17,12 @@ function requireUser(req: Request, res: Response): string | null {
   return id;
 }
 
+function stripDates(data: Record<string, unknown>): Record<string, unknown> {
+  const { createdAt, updatedAt, ...rest } = data;
+  void createdAt; void updatedAt;
+  return rest;
+}
+
 export function registerRoutes(app: Express) {
 
   // --- PROMPTS ---
@@ -27,13 +33,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/prompts", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(prompts).where(and(eq(prompts.id, id), eq(prompts.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(prompts).set({ ...data, updatedAt: new Date() }).where(eq(prompts.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(prompts).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(prompts).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -41,13 +48,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/prompts/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(prompts).where(and(eq(prompts.id, id), eq(prompts.userId, uid))) : [];
       if (existing.length > 0) {
         const [r] = await db.update(prompts).set({ ...data, updatedAt: new Date() }).where(eq(prompts.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(prompts).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(prompts).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
@@ -67,13 +75,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/agents", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(agents).where(and(eq(agents.id, id), eq(agents.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(agents).set({ ...data, updatedAt: new Date() }).where(eq(agents.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(agents).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(agents).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -81,13 +90,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/agents/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(agents).where(and(eq(agents.id, id), eq(agents.userId, uid))) : [];
       if (existing.length > 0) {
         const [r] = await db.update(agents).set({ ...data, updatedAt: new Date() }).where(eq(agents.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(agents).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(agents).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
@@ -107,13 +117,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/components", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(components).where(and(eq(components.id, id), eq(components.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(components).set({ ...data, updatedAt: new Date() }).where(eq(components.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(components).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(components).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -121,13 +132,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/components/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(components).where(and(eq(components.id, id), eq(components.userId, uid))) : [];
       if (existing.length > 0) {
         const [r] = await db.update(components).set({ ...data, updatedAt: new Date() }).where(eq(components.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(components).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(components).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
@@ -147,13 +159,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/templates", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(templates).where(and(eq(templates.id, id), eq(templates.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(templates).set({ ...data, updatedAt: new Date() }).where(eq(templates.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(templates).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(templates).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -161,13 +174,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/templates/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(templates).where(and(eq(templates.id, id), eq(templates.userId, uid))) : [];
       if (existing.length > 0) {
         const [r] = await db.update(templates).set({ ...data, updatedAt: new Date() }).where(eq(templates.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(templates).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(templates).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
@@ -187,13 +201,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/snippets", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(snippets).where(and(eq(snippets.id, id), eq(snippets.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(snippets).set({ ...data, updatedAt: new Date() }).where(eq(snippets.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(snippets).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(snippets).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -201,13 +216,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/snippets/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(snippets).where(and(eq(snippets.id, id), eq(snippets.userId, uid))) : [];
       if (existing.length > 0) {
         const [r] = await db.update(snippets).set({ ...data, updatedAt: new Date() }).where(eq(snippets.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(snippets).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(snippets).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
@@ -227,13 +243,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/connectors", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(connectors).where(and(eq(connectors.id, id), eq(connectors.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(connectors).set({ ...data, updatedAt: new Date() }).where(eq(connectors.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(connectors).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(connectors).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -252,13 +269,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/social-drafts", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(socialDrafts).where(and(eq(socialDrafts.id, id), eq(socialDrafts.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(socialDrafts).set({ ...data, updatedAt: new Date() }).where(eq(socialDrafts.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(socialDrafts).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(socialDrafts).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -277,13 +295,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/mail-templates", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(mailTemplates).where(and(eq(mailTemplates.id, id), eq(mailTemplates.userId, uid))) : [];
     if (existing.length > 0) {
       const [r] = await db.update(mailTemplates).set({ ...data, updatedAt: new Date() }).where(eq(mailTemplates.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(mailTemplates).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(mailTemplates).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -303,13 +322,14 @@ export function registerRoutes(app: Express) {
 
   app.post("/api/interview-questions", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
-    const { id, ...data } = req.body;
+    const { id, ...raw } = req.body;
+    const data = stripDates(raw);
     const existing = id ? await db.select().from(interviewQuestions).where(eq(interviewQuestions.id, id)) : [];
     if (existing.length > 0 && existing[0].userId === uid) {
       const [r] = await db.update(interviewQuestions).set(data).where(eq(interviewQuestions.id, id)).returning();
       res.json(r);
     } else {
-      const [r] = await db.insert(interviewQuestions).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(interviewQuestions).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       res.json(r);
     }
   });
@@ -317,13 +337,14 @@ export function registerRoutes(app: Express) {
   app.post("/api/interview-questions/bulk", async (req, res) => {
     const uid = requireUser(req, res); if (!uid) return;
     const items = req.body as any[];
-    const result = await Promise.all(items.map(async ({ id, ...data }) => {
+    const result = await Promise.all(items.map(async ({ id, ...raw }) => {
+      const data = stripDates(raw);
       const existing = id ? await db.select().from(interviewQuestions).where(eq(interviewQuestions.id, id)) : [];
       if (existing.length > 0 && existing[0].userId === uid) {
         const [r] = await db.update(interviewQuestions).set(data).where(eq(interviewQuestions.id, id)).returning();
         return r;
       }
-      const [r] = await db.insert(interviewQuestions).values({ ...data, userId: uid, ...(id ? { id } : {}) }).returning();
+      const [r] = await db.insert(interviewQuestions).values({ ...data, userId: uid, ...(id ? { id } : {}) } as any).returning();
       return r;
     }));
     res.json(result);
