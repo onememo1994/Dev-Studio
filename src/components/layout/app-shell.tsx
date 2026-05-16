@@ -17,6 +17,7 @@ import {
   Search,
   Users,
   Briefcase,
+  FileText,
 } from "lucide-react";
 import { CommandPalette } from "./command-palette";
 import { ErrorBoundary } from "./error-boundary";
@@ -55,6 +56,13 @@ const COMMUNICATION_NAV = [
     icon: Users,
     match: ["/connectors"],
     search: { tab: "companies" },
+  },
+  {
+    to: "/cv",
+    label: "CV Builder",
+    icon: FileText,
+    match: ["/cv"],
+    search: {},
   },
 ] as const;
 

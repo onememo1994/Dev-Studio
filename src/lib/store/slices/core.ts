@@ -18,7 +18,7 @@ export const createCoreSlice: StateCreator<ForgeState, [["zustand/persist", unkn
     _initInFlight = true;
     set({ isLoading: true });
     try {
-      const [p, a, c, t, s, conn, soc, mail, q, prog] = await Promise.all([
+      const [p, a, c, t, s, conn, soc, mail, q, prog, cvs] = await Promise.all([
         db.getPrompts(),
         db.getAgents(),
         db.getComponents(),
@@ -29,6 +29,7 @@ export const createCoreSlice: StateCreator<ForgeState, [["zustand/persist", unkn
         db.getMailTemplates(),
         db.getInterviewQuestions(),
         db.getUserProgress(),
+        db.getCVProfiles(),
       ]);
       
       const progressMap: Record<string, boolean> = {};
@@ -133,6 +134,7 @@ export const createCoreSlice: StateCreator<ForgeState, [["zustand/persist", unkn
           favorite: x.is_global ?? false,
           createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now()
         })),
+        cvProfiles: cvs,
         userProgress: progressMap,
         initialized: true
       });
