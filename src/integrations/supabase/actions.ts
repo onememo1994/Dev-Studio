@@ -1,9 +1,13 @@
 type LocalRecord = Record<string, unknown>;
 
-const emptyList = async (): Promise<LocalRecord[]> => [];
-const passthrough = async <T extends LocalRecord>(item: T): Promise<T> => item;
-const passthroughList = async <T extends LocalRecord>(items: T[]): Promise<T[]> => items;
-const noop = async (..._args: unknown[]): Promise<void> => undefined;
+async function apiFetch(path: string, options?: RequestInit) {
+  const res = await fetch(path, {
+    headers: { "Content-Type": "application/json" },
+    ...options,
+  });
+  if (!res.ok) throw new Error(`API error ${res.status}: ${await res.text()}`);
+  return res.json();
+}
 
 export async function getCurrentUser() {
   try {
@@ -26,49 +30,120 @@ export async function updateProfile(_profile: {
   return null;
 }
 
-export const getPrompts = emptyList;
-export const upsertPrompt = passthrough;
-export const upsertPrompts = passthroughList;
-export const deletePrompt = noop;
+export async function getPrompts(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/prompts"); } catch { return []; }
+}
+export async function upsertPrompt(p: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/prompts", { method: "POST", body: JSON.stringify(p) });
+}
+export async function upsertPrompts(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/prompts/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deletePrompt(id: string): Promise<void> {
+  await apiFetch(`/api/prompts/${id}`, { method: "DELETE" });
+}
 
-export const getAgents = emptyList;
-export const upsertAgent = passthrough;
-export const upsertAgents = passthroughList;
-export const deleteAgent = noop;
+export async function getAgents(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/agents"); } catch { return []; }
+}
+export async function upsertAgent(a: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/agents", { method: "POST", body: JSON.stringify(a) });
+}
+export async function upsertAgents(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/agents/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deleteAgent(id: string): Promise<void> {
+  await apiFetch(`/api/agents/${id}`, { method: "DELETE" });
+}
 
-export const getComponents = emptyList;
-export const upsertComponent = passthrough;
-export const upsertComponents = passthroughList;
-export const deleteComponent = noop;
+export async function getComponents(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/components"); } catch { return []; }
+}
+export async function upsertComponent(c: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/components", { method: "POST", body: JSON.stringify(c) });
+}
+export async function upsertComponents(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/components/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deleteComponent(id: string): Promise<void> {
+  await apiFetch(`/api/components/${id}`, { method: "DELETE" });
+}
 
-export const getSnippets = emptyList;
-export const upsertSnippet = passthrough;
-export const upsertSnippets = passthroughList;
-export const deleteSnippet = noop;
+export async function getSnippets(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/snippets"); } catch { return []; }
+}
+export async function upsertSnippet(s: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/snippets", { method: "POST", body: JSON.stringify(s) });
+}
+export async function upsertSnippets(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/snippets/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deleteSnippet(id: string): Promise<void> {
+  await apiFetch(`/api/snippets/${id}`, { method: "DELETE" });
+}
 
-export const getTemplates = emptyList;
-export const upsertTemplate = passthrough;
-export const upsertTemplates = passthroughList;
-export const deleteTemplate = noop;
+export async function getTemplates(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/templates"); } catch { return []; }
+}
+export async function upsertTemplate(t: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/templates", { method: "POST", body: JSON.stringify(t) });
+}
+export async function upsertTemplates(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/templates/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deleteTemplate(id: string): Promise<void> {
+  await apiFetch(`/api/templates/${id}`, { method: "DELETE" });
+}
 
-export const getConnectors = emptyList;
-export const upsertConnector = passthrough;
-export const deleteConnector = noop;
+export async function getConnectors(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/connectors"); } catch { return []; }
+}
+export async function upsertConnector(c: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/connectors", { method: "POST", body: JSON.stringify(c) });
+}
+export async function deleteConnector(id: string): Promise<void> {
+  await apiFetch(`/api/connectors/${id}`, { method: "DELETE" });
+}
 
-export const getSocialDrafts = emptyList;
-export const upsertSocialDraft = passthrough;
-export const deleteSocialDraft = noop;
+export async function getSocialDrafts(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/social-drafts"); } catch { return []; }
+}
+export async function upsertSocialDraft(d: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/social-drafts", { method: "POST", body: JSON.stringify(d) });
+}
+export async function deleteSocialDraft(id: string): Promise<void> {
+  await apiFetch(`/api/social-drafts/${id}`, { method: "DELETE" });
+}
 
-export const getMailTemplates = emptyList;
-export const upsertMailTemplate = passthrough;
-export const deleteMailTemplate = noop;
+export async function getMailTemplates(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/mail-templates"); } catch { return []; }
+}
+export async function upsertMailTemplate(m: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/mail-templates", { method: "POST", body: JSON.stringify(m) });
+}
+export async function deleteMailTemplate(id: string): Promise<void> {
+  await apiFetch(`/api/mail-templates/${id}`, { method: "DELETE" });
+}
 
-export const getInterviewQuestions = emptyList;
-export const upsertInterviewQuestion = passthrough;
-export const upsertInterviewQuestions = passthroughList;
-export const deleteInterviewQuestion = noop;
+export async function getInterviewQuestions(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/interview-questions"); } catch { return []; }
+}
+export async function upsertInterviewQuestion(q: LocalRecord): Promise<LocalRecord> {
+  return apiFetch("/api/interview-questions", { method: "POST", body: JSON.stringify(q) });
+}
+export async function upsertInterviewQuestions(items: LocalRecord[]): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/interview-questions/bulk", { method: "POST", body: JSON.stringify(items) }); } catch { return items; }
+}
+export async function deleteInterviewQuestion(id: string): Promise<void> {
+  await apiFetch(`/api/interview-questions/${id}`, { method: "DELETE" });
+}
 
-export const getUserProgress = emptyList;
-export async function toggleProgress(..._args: unknown[]) {
-  return undefined;
+export async function getUserProgress(): Promise<LocalRecord[]> {
+  try { return await apiFetch("/api/progress"); } catch { return []; }
+}
+export async function toggleProgress(itemId: string, areaId: string, completed: boolean): Promise<void> {
+  await apiFetch("/api/progress/toggle", {
+    method: "POST",
+    body: JSON.stringify({ itemId, areaId, completed }),
+  });
 }

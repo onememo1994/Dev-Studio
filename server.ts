@@ -2,6 +2,7 @@ import express from "express";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
+import { registerRoutes } from "./server/routes.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const isProd = process.env.NODE_ENV === "production";
@@ -31,8 +32,6 @@ app.post("/api/auth/logout", (_req, res) => {
   res.json({ ok: true });
 });
 
-// Register database routes (dynamic import for ESM compatibility)
-const { registerRoutes } = await import("./server/routes.js");
 registerRoutes(app);
 
 if (isProd) {
