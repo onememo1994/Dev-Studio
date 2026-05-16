@@ -96,10 +96,10 @@ export const useForge = create<ForgeState>()(
             ]);
             
             const progressMap: Record<string, boolean> = {};
-            prog.forEach(i => progressMap[i.item_id] = i.completed ?? true);
+            prog.forEach((i: any) => progressMap[i.item_id] = i.completed ?? true);
 
             set({
-              prompts: p.map(x => ({
+              prompts: p.map((x: any) => ({
                 id: x.id,
                 title: x.title,
                 body: x.body,
@@ -113,7 +113,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now(),
               })),
-              agents: a.map(x => ({
+              agents: a.map((x: any) => ({
                 id: x.id,
                 name: x.name,
                 role: x.role || "",
@@ -126,7 +126,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              components: c.map(x => ({
+              components: c.map((x: any) => ({
                 id: x.id,
                 name: x.name,
                 description: x.description || "",
@@ -139,7 +139,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              snippets: s.map(x => ({
+              snippets: s.map((x: any) => ({
                 id: x.id,
                 title: x.title,
                 language: x.language,
@@ -149,7 +149,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              connectors: conn.map(x => ({
+              connectors: conn.map((x: any) => ({
                 id: x.id,
                 type: x.type,
                 name: x.name,
@@ -159,7 +159,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              socialDrafts: soc.map(x => ({
+              socialDrafts: soc.map((x: any) => ({
                 id: x.id,
                 platform: x.platform,
                 content: x.content,
@@ -167,7 +167,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              mailTemplates: mail.map(x => ({
+              mailTemplates: mail.map((x: any) => ({
                 id: x.id,
                 channel: x.channel,
                 subject: x.subject || undefined,
@@ -175,7 +175,7 @@ export const useForge = create<ForgeState>()(
                 createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
                 updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
               })),
-              interviewQuestions: q.map(x => ({
+              interviewQuestions: q.map((x: any) => ({
                 id: x.id,
                 question: x.question,
                 answer: x.answer,
@@ -206,7 +206,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().prompts;
         set((s) => ({ 
           prompts: s.prompts.some(x => x.id === p.id) 
-            ? s.prompts.map(x => x.id === p.id ? p : x) 
+            ? s.prompts.map((x: any) => x.id === p.id ? p : x) 
             : [p, ...s.prompts] 
         }));
         
@@ -256,7 +256,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().agents;
         set((s) => ({ 
           agents: s.agents.some(x => x.id === a.id) 
-            ? s.agents.map(x => x.id === a.id ? a : x) 
+            ? s.agents.map((x: any) => x.id === a.id ? a : x) 
             : [a, ...s.agents] 
         }));
 
@@ -293,7 +293,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().components;
         set((s) => ({ 
           components: s.components.some(x => x.id === c.id) 
-            ? s.components.map(x => x.id === c.id ? c : x) 
+            ? s.components.map((x: any) => x.id === c.id ? c : x) 
             : [c, ...s.components] 
         }));
 
@@ -334,7 +334,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().snippets;
         set((s) => ({ 
           snippets: s.snippets.some(x => x.id === snip.id) 
-            ? s.snippets.map(x => x.id === snip.id ? snip : x) 
+            ? s.snippets.map((x: any) => x.id === snip.id ? snip : x) 
             : [snip, ...s.snippets] 
         }));
 
@@ -371,7 +371,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().connectors;
         set((s) => ({ 
           connectors: s.connectors.some(x => x.id === conn.id) 
-            ? s.connectors.map(x => x.id === conn.id ? conn : x) 
+            ? s.connectors.map((x: any) => x.id === conn.id ? conn : x) 
             : [conn, ...s.connectors] 
         }));
 
@@ -408,7 +408,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().socialDrafts;
         set((s) => ({ 
           socialDrafts: s.socialDrafts.some(x => x.id === soc.id) 
-            ? s.socialDrafts.map(x => x.id === soc.id ? soc : x) 
+            ? s.socialDrafts.map((x: any) => x.id === soc.id ? soc : x) 
             : [soc, ...s.socialDrafts] 
         }));
 
@@ -445,7 +445,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().mailTemplates;
         set((s) => ({ 
           mailTemplates: s.mailTemplates.some(x => x.id === mail.id) 
-            ? s.mailTemplates.map(x => x.id === mail.id ? mail : x) 
+            ? s.mailTemplates.map((x: any) => x.id === mail.id ? mail : x) 
             : [mail, ...s.mailTemplates] 
         }));
 
@@ -489,7 +489,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().templates;
         set((s) => ({ 
           templates: s.templates.some(x => x.id === t.id) 
-            ? s.templates.map(x => x.id === t.id ? t : x) 
+            ? s.templates.map((x: any) => x.id === t.id ? t : x) 
             : [t, ...s.templates] 
         }));
 
@@ -525,7 +525,7 @@ export const useForge = create<ForgeState>()(
         const previous = get().interviewQuestions;
         set((s) => ({ 
           interviewQuestions: s.interviewQuestions.some(x => x.id === q.id) 
-            ? s.interviewQuestions.map(x => x.id === q.id ? q : x) 
+            ? s.interviewQuestions.map((x: any) => x.id === q.id ? q : x) 
             : [q, ...s.interviewQuestions] 
         }));
 
@@ -624,7 +624,7 @@ export const useForge = create<ForgeState>()(
           ]);
 
           set({
-            prompts: p.map(x => ({
+            prompts: p.map((x: any) => ({
               id: x.id,
               title: x.title,
               body: x.body,
@@ -638,7 +638,7 @@ export const useForge = create<ForgeState>()(
               createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
               updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now(),
             })),
-            agents: a.map(x => ({
+            agents: a.map((x: any) => ({
               id: x.id,
               name: x.name,
               role: x.role || "",
@@ -651,7 +651,7 @@ export const useForge = create<ForgeState>()(
               createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
               updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
             })),
-            components: c.map(x => ({
+            components: c.map((x: any) => ({
               id: x.id,
               name: x.name,
               description: x.description || "",
@@ -664,7 +664,7 @@ export const useForge = create<ForgeState>()(
               createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
               updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
             })),
-            snippets: s.map(x => ({
+            snippets: s.map((x: any) => ({
               id: x.id,
               title: x.title,
               language: x.language,
@@ -674,7 +674,7 @@ export const useForge = create<ForgeState>()(
               createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
               updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
             })),
-            templates: t.map(x => ({
+            templates: t.map((x: any) => ({
               id: x.id,
               name: x.name,
               description: x.description || "",
@@ -685,7 +685,7 @@ export const useForge = create<ForgeState>()(
               createdAt: x.created_at ? new Date(x.created_at).getTime() : Date.now(),
               updatedAt: x.updated_at ? new Date(x.updated_at).getTime() : Date.now()
             })),
-            interviewQuestions: iq.map(x => ({
+            interviewQuestions: iq.map((x: any) => ({
               id: x.id,
               question: x.question,
               answer: x.answer,
