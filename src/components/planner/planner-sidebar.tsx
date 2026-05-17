@@ -149,7 +149,7 @@ export function PlannerSidebar({
             currentTheme.color
           )}
         >
-          <span className="text-lg shrink-0">{currentTheme.icon}</span>
+          <currentTheme.icon className="size-5 shrink-0" />
           <div className="flex-1 text-left min-w-0">
             <p className="text-[11px] font-bold leading-tight">{currentTheme.title}</p>
             <p className="text-[10px] opacity-70 leading-tight mt-0.5">{currentTheme.subtitle}</p>

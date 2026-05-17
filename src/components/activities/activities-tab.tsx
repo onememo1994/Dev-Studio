@@ -193,7 +193,7 @@ function PrayerPanel() {
   const adjustedDiff = diffMin < 0 ? diffMin + 24 * 60 : diffMin;
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 py-2">
+    <div className="space-y-5 py-2">
       {/* Countdown hero card */}
       <div className="rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 text-center space-y-3 shadow-sm">
         <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
@@ -266,59 +266,75 @@ function PrayerPanel() {
         )}
       </div>
 
-      {/* All prayers list */}
+      {/* All prayers — full-width responsive grid */}
       {!loading && !error && prayers.length > 0 && (
-        <div className="rounded-2xl border border-border/50 bg-muted/20 overflow-hidden">
-          <div className="px-4 py-3 border-b border-border/50 flex items-center gap-2">
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
             <Moon className="size-4 text-primary" />
             <span className="text-sm font-semibold">Today's Prayer Times</span>
           </div>
-          <div className="divide-y divide-border/30">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {prayers.map((prayer, i) => {
               const isNext = i === nextIdx;
               const isPast = to24hMin(prayer.time) < nowMin && !isNext;
               const PIcon  = prayer.Icon;
+              const meta   = PRAYER_META[prayer.name];
+              const iconBg  = isNext
+                ? "bg-primary-foreground/20"
+                : meta.iconColor.replace("text-", "bg-") + "/10";
+              const iconCl  = isNext ? "text-primary-foreground" : meta.iconColor;
               return (
                 <div
                   key={prayer.name}
                   className={cn(
-                    "flex items-center justify-between px-4 py-3.5 transition-all",
-                    isNext ? "bg-primary text-primary-foreground" : isPast ? "opacity-35" : "hover:bg-muted/40"
+                    "relative flex flex-col items-center gap-2 rounded-2xl border p-4 text-center transition-all",
+                    isNext
+                      ? "bg-primary border-primary/30 shadow-md shadow-primary/15 ring-1 ring-primary/25"
+                      : isPast
+                      ? "border-border/30 bg-muted/10 opacity-40"
+                      : "border-border/40 bg-muted/20 hover:bg-muted/40 hover:border-border/60"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    <div className={cn(
-                      "size-8 rounded-xl flex items-center justify-center shrink-0",
-                      isNext ? "bg-primary-foreground/20" : PRAYER_META[prayer.name].iconColor.replace("text-", "bg-") + "/10"
-                    )}>
-                      <PIcon className={cn(
-                        "size-4",
-                        isNext ? "text-primary-foreground" : PRAYER_META[prayer.name].iconColor
-                      )} />
-                    </div>
-                    <div>
-                      <p className={cn("text-sm font-semibold", isNext ? "text-primary-foreground" : "text-foreground")}>
-                        {prayer.name}
-                      </p>
-                      <p className={cn("text-xs", isNext ? "text-primary-foreground/70" : "text-muted-foreground")}>
-                        {prayer.arabicName}
-                      </p>
-                    </div>
+                  {/* Status dot */}
+                  {isNext && (
+                    <span className="absolute top-2.5 right-2.5 size-1.5 rounded-full bg-primary-foreground/80 animate-pulse" />
+                  )}
+
+                  {/* Icon */}
+                  <div className={cn("size-10 rounded-xl flex items-center justify-center shrink-0", iconBg)}>
+                    <PIcon className={cn("size-5", iconCl)} />
                   </div>
-                  <div className="text-right">
-                    <p className={cn(
-                      "text-sm font-bold font-mono",
-                      isNext ? "text-primary-foreground" : PRAYER_META[prayer.name].color
-                    )}>
-                      {formatTime12(prayer.time)}
+
+                  {/* Name */}
+                  <div className="space-y-0.5">
+                    <p className={cn("text-sm font-bold leading-tight", isNext ? "text-primary-foreground" : "text-foreground")}>
+                      {prayer.name}
                     </p>
-                    {isNext && (
-                      <p className="text-[11px] text-primary-foreground/70 flex items-center gap-0.5 justify-end mt-0.5">
-                        <Clock className="size-2.5" /> {formatCountdown(adjustedDiff)}
-                      </p>
-                    )}
-                    {isPast && <p className="text-[11px] text-muted-foreground/50">completed</p>}
+                    <p className={cn("text-[11px] font-medium", isNext ? "text-primary-foreground/70" : "text-muted-foreground")}>
+                      {prayer.arabicName}
+                    </p>
                   </div>
+
+                  {/* Time */}
+                  <p className={cn(
+                    "text-base font-bold font-mono tabular-nums",
+                    isNext ? "text-primary-foreground" : meta.iconColor
+                  )}>
+                    {formatTime12(prayer.time)}
+                  </p>
+
+                  {/* Sub-status */}
+                  {isNext && (
+                    <p className={cn(
+                      "text-[10px] font-semibold px-2 py-0.5 rounded-full",
+                      "bg-primary-foreground/15 text-primary-foreground/80"
+                    )}>
+                      in {formatCountdown(adjustedDiff)}
+                    </p>
+                  )}
+                  {isPast && (
+                    <p className="text-[10px] text-muted-foreground/50 font-medium">done</p>
+                  )}
                 </div>
               );
             })}
@@ -652,11 +668,7 @@ export function ActivitiesTab() {
 
       {/* Content */}
       <div className="flex-1 overflow-y-auto scrollbar-thin px-4 sm:px-6 py-4">
-        {innerTab === "prayer" && (
-          <div className="max-w-lg mx-auto">
-            <PrayerPanel key={dateStr} />
-          </div>
-        )}
+        {innerTab === "prayer" && <PrayerPanel key={dateStr} />}
         {innerTab === "activities" && <DailyActivitiesPanel prayers={prayers} />}
       </div>
     </div>
