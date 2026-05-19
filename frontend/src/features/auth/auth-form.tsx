@@ -29,7 +29,7 @@ export function AuthForm() {
   const { refresh } = useAuth();
 
   useEffect(() => {
-    fetch("/api/auth/config")
+    fetch("/api/auth/config", { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setGoogleEnabled(!!d.googleEnabled))
       .catch(() => setGoogleEnabled(false));
@@ -47,6 +47,7 @@ export function AuthForm() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(body),
       });
       const data = await res.json();
@@ -82,6 +83,7 @@ export function AuthForm() {
       const res = await fetch("/api/auth/verify-email", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: verifyEmail, code: verificationCode }),
       });
       const data = await res.json();
@@ -105,6 +107,7 @@ export function AuthForm() {
       const res = await fetch("/api/auth/resend-verification", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email: verifyEmail }),
       });
       const data = await res.json();
