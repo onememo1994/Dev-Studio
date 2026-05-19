@@ -1,11 +1,9 @@
-import { prompts } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class PromptsService {
   static async getAll(userId: string) {
-    return await uow.prompts.findAll(eq(prompts.userId, userId));
+    return await uow.prompts.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class PromptsService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.prompts.findAll(
-          and(eq(prompts.id, safeId), eq(prompts.userId, userId))
-        )
+      ? await uow.prompts.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

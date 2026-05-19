@@ -1,6 +1,4 @@
-import { savedJobs } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { scrapeIndeedRSS } from "../../infrastructure/lib/scrapers/indeed.js";
 import { scrapeWuzzuf } from "../../infrastructure/lib/scrapers/wuzzuf.js";
 import { scrapeBayt } from "../../infrastructure/lib/scrapers/bayt.js";
@@ -9,7 +7,7 @@ import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class JobsService {
   static async getSaved(userId: string) {
-    return await uow.savedJobs.findAll(eq(savedJobs.userId, userId));
+    return await uow.savedJobs.findByUserId(userId);
   }
 
   static async saveJob(userId: string, rawData: any) {
@@ -18,9 +16,7 @@ export class JobsService {
     const safeId = isUUID(id) ? id : undefined;
 
     if (safeId) {
-      const existing = await uow.savedJobs.findAll(
-        and(eq(savedJobs.id, safeId), eq(savedJobs.userId, userId))
-      );
+      const existing = await uow.savedJobs.findByUserAndId(userId, safeId);
 
       if (existing.length > 0) {
         const r = await uow.savedJobs.update(safeId, data);

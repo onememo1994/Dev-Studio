@@ -1,6 +1,10 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
+import { validateBody, validateParams } from "../middleware/validation.js";
 import { CVService } from "../../application/services/cv.service.js";
+import { CvProfileDto, AtsCheckDto, ParsePdfDto } from "../dtos/cv.dto.js";
+import { IdParamDto } from "../dtos/common.dto.js";
+
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -67,8 +71,8 @@ export const postParsePdf = async (req: Request, res: Response) => {
 
 const router = Router();
 router.get("/", getAll);
-router.post("/", create);
-router.delete("/:id", deleteById);
-router.post("/ats-check", postAtsCheck);
-router.post("/parse-pdf", postParsePdf);
+router.post("/", validateBody(CvProfileDto), create);
+router.delete("/:id", validateParams(IdParamDto), deleteById);
+router.post("/ats-check", validateBody(AtsCheckDto), postAtsCheck);
+router.post("/parse-pdf", validateBody(ParsePdfDto), postParsePdf);
 export default router;

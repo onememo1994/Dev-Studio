@@ -1,9 +1,23 @@
-import type { Prompt } from "../../types/tools";
-
 const now = Date.now();
 const id = (p: string, i: number) => `${p}_${i}`;
 
-export const seedPrompts: Prompt[] = [
+export interface PromptSeed {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  tags: string[];
+  body: string;
+  variables: string[];
+  model?: string;
+  favorite?: boolean;
+  usageCount: number;
+  versions: { id: string; createdAt: number; body: string; note?: string }[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const seedPrompts: PromptSeed[] = [
   {
     id: id("p", 1),
     title: "Database Schema Architect",

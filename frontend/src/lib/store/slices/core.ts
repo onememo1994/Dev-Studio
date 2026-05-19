@@ -3,14 +3,7 @@ import { ForgeState } from "../types";
 import * as db from "@/lib/api";
 import { Difficulty, FocusArea } from "@/types/common";
 import { Prompt, Agent } from "@/types/tools";
-import { seedPrompts } from "@/data/tools/prompts";
-import { seedAgents } from "@/data/tools/agents";
-import { seedComponents } from "@/data/tools/components";
-import { seedSnippets } from "@/data/tools/snippets";
-import { seedTemplates } from "@/data/tools/templates";
-import { seedConnectors } from "@/data/connectors/connectors";
-import { seedSocialDrafts } from "@/data/social/social-drafts";
-import { seedMailTemplates } from "@/data/mails/mail-templates";
+
 
 let _initInFlight = false;
 
@@ -147,146 +140,11 @@ export const createCoreSlice: StateCreator<
         initialized: true,
       });
 
-      if (p.length === 0 && a.length === 0) {
-        await get().seedIfEmpty();
-      } else if (conn.length === 0 || soc.length === 0 || mail.length === 0) {
-        await get().seedExtrasIfEmpty();
-      }
     } catch (e) {
       console.error("Init store error:", e);
     } finally {
       _initInFlight = false;
       set({ isLoading: false });
-    }
-  },
-
-  seedIfEmpty: async () => {
-    console.log("Seeding initial data...");
-
-    const promptsData = seedPrompts.map(({ id: _id, ...p }) => ({
-      ...p,
-      user_id: "local",
-      body: p.body,
-      system_prompt: "",
-    }));
-    const agentsData = seedAgents.map(({ id: _id, ...a }) => ({
-      ...a,
-      user_id: "local",
-      system_prompt: a.systemPrompt,
-    }));
-    const componentsData = seedComponents.map(({ id: _id, ...c }) => ({
-      ...c,
-      user_id: "local",
-    }));
-    const snippetsData = seedSnippets.map(({ id: _id, ...s }) => ({
-      ...s,
-      user_id: "local",
-    }));
-    const templatesData = seedTemplates.map(({ id: _id, ...t }) => ({
-      ...t,
-      user_id: "local",
-    }));
-    const connectorsData = seedConnectors.map(({ id: _id, ...c }) => ({
-      ...c,
-      user_id: "local",
-    }));
-    const socialDraftsData = seedSocialDrafts.map(({ id: _id, ...d }) => ({
-      ...d,
-      media_urls: d.mediaUrls,
-      user_id: "local",
-    }));
-    const mailTemplatesData = seedMailTemplates.map(({ id: _id, ...m }) => ({
-      ...m,
-      user_id: "local",
-    }));
-
-    try {
-      await Promise.all([
-        db.upsertPrompts(promptsData),
-        db.upsertAgents(agentsData),
-        db.upsertComponents(componentsData),
-        db.upsertSnippets(snippetsData),
-        db.upsertTemplates(templatesData),
-        db.upsertConnectors(connectorsData),
-        db.upsertSocialDrafts(socialDraftsData),
-        db.upsertMailTemplates(mailTemplatesData),
-      ]);
-
-      // Force refresh by re-initializing (or just updating state directly)
-      set({ initialized: false });
-      await get().init();
-    } catch (e) {
-      console.error("Seeding error:", e);
-    }
-  },
-
-  seedExtrasIfEmpty: async () => {
-    console.log("Seeding extras (connectors / social / mail)...");
-    const state = get();
-
-    const connectorsData =
-      state.connectors.length === 0
-        ? seedConnectors.map(({ id: _id, ...c }) => ({ ...c, user_id: "local" }))
-        : [];
-    const socialDraftsData =
-      state.socialDrafts.length === 0
-        ? seedSocialDrafts.map(({ id: _id, ...d }) => ({
-            ...d,
-            media_urls: d.mediaUrls,
-            user_id: "local",
-          }))
-        : [];
-    const mailTemplatesData =
-      state.mailTemplates.length === 0
-        ? seedMailTemplates.map(({ id: _id, ...m }) => ({ ...m, user_id: "local" }))
-        : [];
-
-    try {
-      await Promise.all([
-        connectorsData.length > 0 ? db.upsertConnectors(connectorsData) : Promise.resolve([]),
-        socialDraftsData.length > 0 ? db.upsertSocialDrafts(socialDraftsData) : Promise.resolve([]),
-        mailTemplatesData.length > 0
-          ? db.upsertMailTemplates(mailTemplatesData)
-          : Promise.resolve([]),
-      ]);
-
-      // Partial refresh
-      const [conn, soc, mail] = await Promise.all([
-        db.getConnectors(),
-        db.getSocialDrafts(),
-        db.getMailTemplates(),
-      ]);
-
-      set({
-        connectors: conn.map((x) => ({
-          id: x.id,
-          type: x.type,
-          name: x.name,
-          email: x.email || undefined,
-          phone: x.phone || undefined,
-          notes: x.notes || undefined,
-          createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
-          updatedAt: x.updatedAt ? new Date(x.updatedAt).getTime() : Date.now(),
-        })),
-        socialDrafts: soc.map((x) => ({
-          id: x.id,
-          platform: x.platform,
-          content: x.content,
-          mediaUrls: x.mediaUrls || [],
-          createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
-          updatedAt: x.updatedAt ? new Date(x.updatedAt).getTime() : Date.now(),
-        })),
-        mailTemplates: mail.map((x) => ({
-          id: x.id,
-          channel: x.channel,
-          subject: x.subject || undefined,
-          content: x.content,
-          createdAt: x.createdAt ? new Date(x.createdAt).getTime() : Date.now(),
-          updatedAt: x.updatedAt ? new Date(x.updatedAt).getTime() : Date.now(),
-        })),
-      });
-    } catch (e) {
-      console.error("Extras seeding error:", e);
     }
   },
 

@@ -1,10 +1,8 @@
-import { userProfiles } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class ProfileService {
   static async getByUserId(userId: string) {
-    const rows = await uow.userProfiles.findAll(eq(userProfiles.userId, userId));
+    const rows = await uow.userProfiles.findByUserId(userId);
     return rows[0] ?? null;
   }
 
@@ -12,7 +10,7 @@ export class ProfileService {
     userId: string,
     data: { displayName?: string; avatarUrl?: string; location?: string },
   ) {
-    const existing = await uow.userProfiles.findAll(eq(userProfiles.userId, userId));
+    const existing = await uow.userProfiles.findByUserId(userId);
 
     if (existing.length > 0) {
       // Find the profile ID to perform an ID-based update
@@ -25,3 +23,4 @@ export class ProfileService {
     }
   }
 }
+

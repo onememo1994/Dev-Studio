@@ -17,6 +17,7 @@ export interface IUnitOfWork {
   plannerTasks: IRepository<any, any>;
   authUsers: IRepository<any, any>;
   userProfiles: IRepository<any, any>;
+  userProgress: IRepository<any, any>;
 
   transaction<T>(callback: (uow: IUnitOfWork) => Promise<T>): Promise<T>;
 }

@@ -1,5 +1,7 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
+import { validateBody, validateQuery, validateParams } from "../middleware/validation.js";
+import { PlannerTaskDto, PlannerSuggestDto, PlannerSeedDto, PlannerQueryDto } from "../dtos/planner.dto.js";
 import { PlannerService } from "../../application/services/planner.service.js";
 
 export const getAll = async (req: Request, res: Response) => {
@@ -66,10 +68,12 @@ export const postSeed = async (req: Request, res: Response) => {
   }
 };
 
+import { IdParamDto } from "../dtos/common.dto.js";
+
 const router = Router();
-router.get("/", getAll);
-router.post("/", create);
-router.delete("/:id", deleteById);
-router.post("/suggest", postSuggest);
-router.post("/seed", postSeed);
+router.get("/", validateQuery(PlannerQueryDto), getAll);
+router.post("/", validateBody(PlannerTaskDto), create);
+router.delete("/:id", validateParams(IdParamDto), deleteById);
+router.post("/suggest", validateBody(PlannerSuggestDto), postSuggest);
+router.post("/seed", validateBody(PlannerSeedDto), postSeed);
 export default router;

@@ -1,11 +1,11 @@
 import { Trophy, Plus, X, Search, Check, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type Question, SUGGESTED_QUESTIONS } from "@/data/soft/behavioral";
+import { type Question, type InterviewQuestion } from "@/types/skills";
 import { AddQuestionForm } from "./add-question-form";
 
 interface QuestionSidebarProps {
   filtered: Question[];
-  suggestions: (typeof SUGGESTED_QUESTIONS)[number][];
+  suggestions: InterviewQuestion[];
   activeId: string;
   search: string;
   showAddQ: boolean;
@@ -16,7 +16,7 @@ interface QuestionSidebarProps {
   onSaveNewQuestion: (title: string, guide: string) => void;
   onDeleteQuestion: (id: string) => void;
   onCancelDelete: () => void;
-  onAddSuggested: (s: (typeof SUGGESTED_QUESTIONS)[number]) => void;
+  onAddSuggested: (s: InterviewQuestion) => void;
 }
 
 export function QuestionSidebar({
@@ -163,7 +163,7 @@ export function QuestionSidebar({
                   className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-muted-foreground/60 hover:bg-muted/40 hover:text-muted-foreground transition-all group"
                 >
                   <Plus className="size-3 shrink-0 opacity-50 group-hover:opacity-100 transition-opacity" />
-                  <span className="truncate text-left">{s.title}</span>
+                  <span className="truncate text-left">{s.question}</span>
                 </button>
               ))}
             </nav>

@@ -1,9 +1,18 @@
-import type { Template } from "../../types/tools";
-
 const now = Date.now();
-const id = (p: string, i: number) => `${p}_${i}`;
 
-export const seedTemplates: Template[] = [
+export interface TemplateSeed {
+  id: string;
+  name: string;
+  description: string;
+  stack: string[];
+  tags: string[];
+  structure: string;
+  notes: string;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const seedTemplates: TemplateSeed[] = [
   {
     id: "t_1",
     name: "SaaS Boilerplate (Next.js + Drizzle)",

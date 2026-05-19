@@ -1,6 +1,9 @@
 export interface IRepository<TSelect, TInsert> {
   findById(id: string): Promise<TSelect | null>;
   findAll(filter?: any): Promise<TSelect[]>;
+  findByUserId(userId: string): Promise<TSelect[]>;
+  findByUserAndId(userId: string, id: string): Promise<TSelect[]>;
+  findByField(field: string, value: unknown): Promise<TSelect[]>;
   create(data: TInsert): Promise<TSelect>;
   createMany(data: TInsert[]): Promise<TSelect[]>;
   update(id: string, data: Partial<TInsert>): Promise<TSelect>;
@@ -8,3 +11,4 @@ export interface IRepository<TSelect, TInsert> {
   delete(id: string): Promise<boolean>;
   deleteMany(filter: any): Promise<boolean>;
 }
+

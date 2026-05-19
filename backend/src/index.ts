@@ -18,6 +18,8 @@ import {
   globalErrorHandler,
 } from "./presentation/middleware/error.js";
 
+import { runSeeding } from "./infrastructure/database/seed.js";
+
 const isProd = process.env.NODE_ENV === "production";
 const PORT = Number(process.env.PORT || 5000);
 
@@ -60,6 +62,19 @@ app.get("/", (_req: Request, res: Response) => {
 app.use(notFoundHandler);
 app.use(globalErrorHandler);
 
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Dev Studio running on port ${PORT}`);
-});
+async function startServer() {
+  try {
+    console.log("Checking and seeding database...");
+    await runSeeding();
+    console.log("Seeding check complete.");
+  } catch (err) {
+    console.error("Database seeding failed on startup:", err);
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Dev Studio running on port ${PORT}`);
+  });
+}
+
+startServer();
+

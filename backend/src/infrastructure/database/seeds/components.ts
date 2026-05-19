@@ -1,9 +1,20 @@
-import type { ComponentAsset } from "../../types/tools";
-
 const now = Date.now();
-const id = (p: string, i: number) => `${p}_${i}`;
 
-export const seedComponents: ComponentAsset[] = [
+export interface ComponentSeed {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  tags: string[];
+  code: string;
+  dependencies: string[];
+  favorite?: boolean;
+  usageCount?: number;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const seedComponents: ComponentSeed[] = [
   {
     id: "c_1",
     name: "Glass Sidebar",

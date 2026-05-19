@@ -1,11 +1,9 @@
-import { templates } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class TemplatesService {
   static async getAll(userId: string) {
-    return await uow.templates.findAll(eq(templates.userId, userId));
+    return await uow.templates.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class TemplatesService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.templates.findAll(
-          and(eq(templates.id, safeId), eq(templates.userId, userId))
-        )
+      ? await uow.templates.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

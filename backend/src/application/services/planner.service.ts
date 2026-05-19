@@ -2,7 +2,7 @@
 import { plannerTasks } from "../../domain/schema.js";
 import { eq, and, gte, lte, isNull } from "drizzle-orm";
 import { getOpenAI } from "../../infrastructure/lib/openai.js";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 import { PlannerMapper } from "../../domain/mappers/planner.mapper.js";
 
@@ -18,7 +18,7 @@ export class PlannerService {
         )
       );
     } else {
-      rows = await uow.plannerTasks.findAll(eq(plannerTasks.userId, userId));
+      rows = await uow.plannerTasks.findByUserId(userId);
     }
     return rows.map(PlannerMapper.toDomain);
   }
@@ -41,9 +41,7 @@ export class PlannerService {
 
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.plannerTasks.findAll(
-          and(eq(plannerTasks.id, safeId), eq(plannerTasks.userId, userId))
-        )
+      ? await uow.plannerTasks.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type Scenario } from "@/data/soft/behavioral";
+import { type Scenario } from "@/types/skills";
 
 interface ScenarioFormProps {
   initial?: Partial<Scenario>;

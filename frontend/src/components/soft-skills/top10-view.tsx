@@ -4,7 +4,7 @@ import { SplitLayout } from "@/components/layout";
 import { cn } from "@/lib/utils";
 import { useForge, newId } from "@/lib/store";
 import { useMemo } from "react";
-import { SUGGESTED_QUESTIONS, type Scenario, type Question } from "@/data/soft/behavioral";
+import { type Scenario, type Question, type InterviewQuestion } from "@/types/skills";
 import { QuestionSidebar, GuideSection, ScenariosSection } from "./top10";
 
 /* ─── Main View ──────────────────────────────────────────────── */
@@ -12,19 +12,37 @@ import { QuestionSidebar, GuideSection, ScenariosSection } from "./top10";
 export function Top10QuestionsView() {
   const { interviewQuestions, upsertInterviewQuestion, deleteInterviewQuestion } = useForge();
 
-  /* ── Derived question list ───────────────────────────────── */
-  const questions = useMemo<Question[]>(
-    () =>
-      interviewQuestions
-        .filter((q) => q.area === "softskills")
-        .map((q) => ({
-          id: q.id,
-          title: q.question,
-          guide: q.answer,
-          scenarios: (q.answerDepths as any as Scenario[]) || [],
-        })),
-    [interviewQuestions],
-  );
+  /* ── Derived question lists from backend ───────────────────── */
+  const userQuestions = useMemo(() => {
+    return interviewQuestions.filter((q) => q.area === "softskills" && !q.isGlobal);
+  }, [interviewQuestions]);
+
+  const globalQuestions = useMemo(() => {
+    return interviewQuestions.filter((q) => q.area === "softskills" && q.isGlobal);
+  }, [interviewQuestions]);
+
+  const questions = useMemo<Question[]>(() => {
+    const userQMap = new Set(userQuestions.map((q) => q.question.toLowerCase()));
+    const list: Question[] = userQuestions.map((q) => ({
+      id: q.id,
+      title: q.question,
+      guide: q.answer,
+      scenarios: (q.answerDepths as any as Scenario[]) || [],
+    }));
+
+    for (const gq of globalQuestions) {
+      const isDefault = gq.tags?.includes("default");
+      if (isDefault && !userQMap.has(gq.question.toLowerCase())) {
+        list.push({
+          id: gq.id,
+          title: gq.question,
+          guide: gq.answer,
+          scenarios: (gq.answerDepths as any as Scenario[]) || [],
+        });
+      }
+    }
+    return list;
+  }, [userQuestions, globalQuestions]);
 
   /* ── CRUD helpers ────────────────────────────────────────── */
   const addQuestion = (title: string, guide: string) => {
@@ -35,7 +53,7 @@ export function Top10QuestionsView() {
       answer: guide.trim(),
       area: "softskills",
       difficulty: "mid",
-      tags: ["behavioral"],
+      tags: ["behavioral", "default"],
       answerDepths: [] as any,
       isGlobal: false,
       createdAt: Date.now(),
@@ -47,7 +65,26 @@ export function Top10QuestionsView() {
 
   const updateQuestion = (id: string, patch: Partial<Pick<Question, "title" | "guide">>) => {
     const q = interviewQuestions.find((q) => q.id === id);
-    if (!q) return;
+    if (!q) {
+      // If it's a global question that the user is editing for the first time, create a copy
+      const gq = globalQuestions.find((g) => g.id === id);
+      if (gq) {
+        const newIdVal = newId();
+        upsertInterviewQuestion({
+          id: newIdVal,
+          question: patch.title !== undefined ? patch.title : gq.question,
+          answer: patch.guide !== undefined ? patch.guide : gq.answer,
+          area: "softskills",
+          difficulty: gq.difficulty,
+          tags: ["behavioral", "default"],
+          answerDepths: gq.answerDepths || [],
+          isGlobal: false,
+          createdAt: Date.now(),
+        });
+        setActiveId(newIdVal);
+      }
+      return;
+    }
     upsertInterviewQuestion({
       ...q,
       ...(patch.title !== undefined && { question: patch.title }),
@@ -57,7 +94,27 @@ export function Top10QuestionsView() {
 
   const addScenario = (qid: string, s: Omit<Scenario, "id" | "createdAt">) => {
     const q = interviewQuestions.find((q) => q.id === qid);
-    if (!q) return;
+    if (!q) {
+      // If adding a scenario to a global question, we must copy it first
+      const gq = globalQuestions.find((g) => g.id === qid);
+      if (gq) {
+        const newIdVal = newId();
+        const sc: Scenario = { ...s, id: `sc-${Date.now()}`, createdAt: Date.now() };
+        upsertInterviewQuestion({
+          id: newIdVal,
+          question: gq.question,
+          answer: gq.answer,
+          area: "softskills",
+          difficulty: gq.difficulty,
+          tags: ["behavioral", "default"],
+          answerDepths: [...(gq.answerDepths || []), sc] as any,
+          isGlobal: false,
+          createdAt: Date.now(),
+        });
+        setActiveId(newIdVal);
+      }
+      return;
+    }
     const sc: Scenario = { ...s, id: `sc-${Date.now()}`, createdAt: Date.now() };
     upsertInterviewQuestion({ ...q, answerDepths: [...(q.answerDepths || []), sc] as any });
   };
@@ -68,7 +125,29 @@ export function Top10QuestionsView() {
     patch: Partial<Omit<Scenario, "id" | "createdAt">>,
   ) => {
     const q = interviewQuestions.find((q) => q.id === qid);
-    if (!q) return;
+    if (!q) {
+      // Copy global first
+      const gq = globalQuestions.find((g) => g.id === qid);
+      if (gq) {
+        const newIdVal = newId();
+        const updatedDepths = (gq.answerDepths || []).map((s: any) =>
+          s.id === sid ? { ...s, ...patch } : s,
+        );
+        upsertInterviewQuestion({
+          id: newIdVal,
+          question: gq.question,
+          answer: gq.answer,
+          area: "softskills",
+          difficulty: gq.difficulty,
+          tags: ["behavioral", "default"],
+          answerDepths: updatedDepths as any,
+          isGlobal: false,
+          createdAt: Date.now(),
+        });
+        setActiveId(newIdVal);
+      }
+      return;
+    }
     upsertInterviewQuestion({
       ...q,
       answerDepths: (q.answerDepths || []).map((s: any) =>
@@ -79,27 +158,49 @@ export function Top10QuestionsView() {
 
   const removeScenario = (qid: string, sid: string) => {
     const q = interviewQuestions.find((q) => q.id === qid);
-    if (!q) return;
+    if (!q) {
+      // Copy global first
+      const gq = globalQuestions.find((g) => g.id === qid);
+      if (gq) {
+        const newIdVal = newId();
+        const updatedDepths = (gq.answerDepths || []).filter((s: any) => s.id !== sid);
+        upsertInterviewQuestion({
+          id: newIdVal,
+          question: gq.question,
+          answer: gq.answer,
+          area: "softskills",
+          difficulty: gq.difficulty,
+          tags: ["behavioral", "default"],
+          answerDepths: updatedDepths as any,
+          isGlobal: false,
+          createdAt: Date.now(),
+        });
+        setActiveId(newIdVal);
+      }
+      return;
+    }
     upsertInterviewQuestion({
       ...q,
       answerDepths: (q.answerDepths || []).filter((s: any) => s.id !== sid) as any,
     });
   };
 
-  const addSuggested = (s: (typeof SUGGESTED_QUESTIONS)[number]) => {
-    if (questions.some((q) => q.id === s.id)) return s.id;
+  const addSuggested = (s: InterviewQuestion) => {
+    const userQMap = new Set(userQuestions.map((q) => q.question.toLowerCase()));
+    if (userQMap.has(s.question.toLowerCase())) return s.id;
+    const newIdVal = newId();
     upsertInterviewQuestion({
-      id: s.id,
-      question: s.title,
-      answer: s.guide,
+      id: newIdVal,
+      question: s.question,
+      answer: s.answer,
       area: "softskills",
-      difficulty: "mid",
-      tags: ["behavioral"],
+      difficulty: s.difficulty,
+      tags: ["behavioral", "default"],
       answerDepths: [] as any,
       isGlobal: false,
       createdAt: Date.now(),
     });
-    return s.id;
+    return newIdVal;
   };
 
   /* ── UI state ────────────────────────────────────────────── */
@@ -124,8 +225,13 @@ export function Top10QuestionsView() {
   }, [questions]);
 
   const filtered = questions.filter((q) => q.title.toLowerCase().includes(search.toLowerCase()));
-  const addedIds = new Set(questions.map((q) => q.id));
-  const suggestions = SUGGESTED_QUESTIONS.filter((s) => !addedIds.has(s.id));
+  const suggestions = useMemo<InterviewQuestion[]>(() => {
+    const userQMap = new Set(userQuestions.map((q) => q.question.toLowerCase()));
+    return globalQuestions.filter((gq) => {
+      const isSuggested = gq.tags?.includes("suggested");
+      return isSuggested && !userQMap.has(gq.question.toLowerCase());
+    });
+  }, [userQuestions, globalQuestions]);
 
   /* title inline edit */
   const startEditTitle = () => {

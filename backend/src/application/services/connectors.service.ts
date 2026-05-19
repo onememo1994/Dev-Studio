@@ -1,11 +1,9 @@
-import { connectors } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class ConnectorsService {
   static async getAll(userId: string) {
-    return await uow.connectors.findAll(eq(connectors.userId, userId));
+    return await uow.connectors.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class ConnectorsService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.connectors.findAll(
-          and(eq(connectors.id, safeId), eq(connectors.userId, userId))
-        )
+      ? await uow.connectors.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

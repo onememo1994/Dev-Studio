@@ -1,11 +1,9 @@
-import { socialDrafts } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class SocialService {
   static async getAll(userId: string) {
-    return await uow.socialDrafts.findAll(eq(socialDrafts.userId, userId));
+    return await uow.socialDrafts.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class SocialService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.socialDrafts.findAll(
-          and(eq(socialDrafts.id, safeId), eq(socialDrafts.userId, userId))
-        )
+      ? await uow.socialDrafts.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

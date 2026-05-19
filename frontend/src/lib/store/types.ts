@@ -63,7 +63,5 @@ export interface ForgeState {
   upsertInterviewQuestion: (q: InterviewQuestion) => Promise<void>;
   deleteInterviewQuestion: (id: string) => Promise<void>;
   toggleFavoriteInterviewQuestion: (id: string) => Promise<void>;
-  seedIfEmpty: () => Promise<void>;
-  seedExtrasIfEmpty: () => Promise<void>;
   hardReset: () => void;
 }

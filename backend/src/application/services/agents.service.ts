@@ -1,11 +1,9 @@
-import { agents } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class AgentsService {
   static async getAll(userId: string) {
-    return await uow.agents.findAll(eq(agents.userId, userId));
+    return await uow.agents.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class AgentsService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.agents.findAll(
-          and(eq(agents.id, safeId), eq(agents.userId, userId))
-        )
+      ? await uow.agents.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
+import { validateBody, validateParams } from "../middleware/validation.js";
 import { InterviewService } from "../../application/services/interview.service.js";
+import { InterviewQuestionDto, ProgressToggleDto } from "../dtos/learning.dto.js";
+import { z } from "zod";
+import { IdParamDto } from "../dtos/common.dto.js";
+
 
 export const getQuestions = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -80,9 +85,9 @@ export const postProgressToggle = async (req: Request, res: Response) => {
 
 const router = Router();
 router.get("/questions", getQuestions);
-router.post("/questions", postQuestions);
-router.post("/questions/bulk", postQuestionsBulk);
-router.delete("/questions/:id", deleteQuestionsById);
+router.post("/questions", validateBody(InterviewQuestionDto), postQuestions);
+router.post("/questions/bulk", validateBody(z.array(InterviewQuestionDto)), postQuestionsBulk);
+router.delete("/questions/:id", validateParams(IdParamDto), deleteQuestionsById);
 router.get("/progress", getProgress);
-router.post("/progress/toggle", postProgressToggle);
+router.post("/progress/toggle", validateBody(ProgressToggleDto), postProgressToggle);
 export default router;

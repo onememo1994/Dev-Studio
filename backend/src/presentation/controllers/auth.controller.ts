@@ -1,4 +1,6 @@
 import { Router, Request, Response, NextFunction } from "express";
+import { validateBody, validateParams } from "../middleware/validation.js";
+import { RegisterDto, LoginDto, VerifyEmailDto, ResendVerificationDto } from "../dtos/auth.dto.js";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { db } from "../../infrastructure/database/index.js";
@@ -52,12 +54,6 @@ export function safeUser(u: typeof authUsers.$inferSelect) {
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, displayName } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ error: "Email and password are required" });
-    if (password.length < 6)
-      return res
-        .status(400)
-        .json({ error: "Password must be at least 6 characters" });
 
     const existing = await AuthService.findUserByEmail(email);
     if (existing)
@@ -85,8 +81,6 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
-    if (!email || !password)
-      return res.status(400).json({ error: "Email and password are required" });
 
     const user = await AuthService.findUserByEmail(email);
     if (!user || !user.passwordHash)
@@ -119,10 +113,6 @@ export const login = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const { email, code } = req.body;
-    if (!email || !code)
-      return res
-        .status(400)
-        .json({ error: "Email and verification code are required" });
 
     const user = await AuthService.findUserByEmail(email);
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -152,7 +142,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
 export const resendVerification = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
-    if (!email) return res.status(400).json({ error: "Email is required" });
 
     const user = await AuthService.findUserByEmail(email);
     if (!user) return res.status(404).json({ error: "User not found" });
@@ -283,10 +272,10 @@ import { authLimiter } from "../config/rate-limit.js";
 
 const router = Router();
 router.use(authLimiter);
-router.post("/register", register);
-router.post("/login", login);
-router.post("/verify-email", verifyEmail);
-router.post("/resend-verification", resendVerification);
+router.post("/register", validateBody(RegisterDto), register);
+router.post("/login", validateBody(LoginDto), login);
+router.post("/verify-email", validateBody(VerifyEmailDto), verifyEmail);
+router.post("/resend-verification", validateBody(ResendVerificationDto), resendVerification);
 router.post("/logout", logout);
 router.get("/user", getUser);
 router.get("/config", getConfig);

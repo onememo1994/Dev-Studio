@@ -1,9 +1,21 @@
-import type { Agent } from "../../types/tools";
-
 const now = Date.now();
-const id = (p: string, i: number) => `${p}_${i}`;
 
-export const seedAgents: Agent[] = [
+export interface AgentSeed {
+  id: string;
+  name: string;
+  role: string;
+  systemPrompt: string;
+  tools: string[];
+  model: string;
+  temperature: number;
+  status: "active" | "idle" | "draft";
+  tags: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+
+export const seedAgents: AgentSeed[] = [
   {
     id: "a_1",
     name: "Code Auditor",

@@ -1,6 +1,9 @@
 import type { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
+// Re-export domain utilities for backward compatibility
+export { stripDates, isUUID } from "../../domain/utils.js";
+
 const COOKIE_NAME = "ds_token";
 
 export function getUserId(req: Request): string | null {
@@ -27,20 +30,3 @@ export function requireUser(req: Request, res: Response): string | null {
   return id;
 }
 
-export function stripDates(
-  data: Record<string, unknown>,
-): Record<string, unknown> {
-  const { createdAt, updatedAt, created_at, updated_at, ...rest } = data;
-  void createdAt;
-  void updatedAt;
-  void created_at;
-  void updated_at;
-  return rest;
-}
-
-export function isUUID(id: unknown): id is string {
-  return (
-    typeof id === "string" &&
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)
-  );
-}

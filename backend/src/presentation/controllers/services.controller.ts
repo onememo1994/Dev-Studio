@@ -1,6 +1,10 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
+import { validateBody, validateParams } from "../middleware/validation.js";
 import { MyServicesService } from "../../application/services/services.service.js";
+import { MyServiceDto } from "../dtos/career.dto.js";
+import { IdParamDto } from "../dtos/common.dto.js";
+
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -38,6 +42,6 @@ export const deleteById = async (req: Request, res: Response) => {
 
 const router = Router();
 router.get("/", getAll);
-router.post("/", create);
-router.delete("/:id", deleteById);
+router.post("/", validateBody(MyServiceDto), create);
+router.delete("/:id", validateParams(IdParamDto), deleteById);
 export default router;

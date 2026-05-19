@@ -1,11 +1,9 @@
-import { mailTemplates } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class MailService {
   static async getAll(userId: string) {
-    return await uow.mailTemplates.findAll(eq(mailTemplates.userId, userId));
+    return await uow.mailTemplates.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class MailService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.mailTemplates.findAll(
-          and(eq(mailTemplates.id, safeId), eq(mailTemplates.userId, userId))
-        )
+      ? await uow.mailTemplates.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

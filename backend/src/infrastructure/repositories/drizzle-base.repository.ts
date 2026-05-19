@@ -45,6 +45,41 @@ export class DrizzleBaseRepository<
       .where(whereClause);
   }
 
+  async findByUserId(userId: string): Promise<TSelect[]> {
+    if (!("userId" in this.table)) {
+      throw new Error("Table does not have a userId column");
+    }
+    const whereClause = this.applySoftDelete(eq((this.table as any).userId, userId));
+    return await this.dbClient
+      .select()
+      .from(this.table)
+      .where(whereClause);
+  }
+
+  async findByUserAndId(userId: string, id: string): Promise<TSelect[]> {
+    if (!("userId" in this.table)) {
+      throw new Error("Table does not have a userId column");
+    }
+    const whereClause = this.applySoftDelete(
+      and(eq((this.table as any).id, id), eq((this.table as any).userId, userId))
+    );
+    return await this.dbClient
+      .select()
+      .from(this.table)
+      .where(whereClause);
+  }
+
+  async findByField(field: string, value: unknown): Promise<TSelect[]> {
+    if (!(field in this.table)) {
+      throw new Error(`Table does not have a '${field}' column`);
+    }
+    const whereClause = this.applySoftDelete(eq((this.table as any)[field], value));
+    return await this.dbClient
+      .select()
+      .from(this.table)
+      .where(whereClause);
+  }
+
   async create(data: TInsert): Promise<TSelect> {
     const [row] = await this.dbClient
       .insert(this.table)

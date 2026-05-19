@@ -1,11 +1,9 @@
 import bcrypt from "bcryptjs";
-import { authUsers } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class AuthService {
   static async findUserByEmail(email: string) {
-    const [user] = await uow.authUsers.findAll(eq(authUsers.email, email.toLowerCase()));
+    const [user] = await uow.authUsers.findByField('email', email.toLowerCase());
     return user ?? null;
   }
 

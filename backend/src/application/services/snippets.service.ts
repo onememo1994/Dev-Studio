@@ -1,11 +1,9 @@
-import { snippets } from "../../domain/schema.js";
-import { eq, and } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class SnippetsService {
   static async getAll(userId: string) {
-    return await uow.snippets.findAll(eq(snippets.userId, userId));
+    return await uow.snippets.findByUserId(userId);
   }
 
   static async create(userId: string, rawData: any) {
@@ -13,9 +11,7 @@ export class SnippetsService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.snippets.findAll(
-          and(eq(snippets.id, safeId), eq(snippets.userId, userId))
-        )
+      ? await uow.snippets.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

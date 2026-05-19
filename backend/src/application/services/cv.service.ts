@@ -1,14 +1,12 @@
 
-import { cvProfiles } from "../../domain/schema.js";
-import { eq, and, isNull } from "drizzle-orm";
 import { getOpenAI } from "../../infrastructure/lib/openai.js";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 import { CVMapper } from "../../domain/mappers/cv.mapper.js";
 
 export class CVService {
   static async getAll(userId: string) {
-    const rows = await uow.cvProfiles.findAll(eq(cvProfiles.userId, userId));
+    const rows = await uow.cvProfiles.findByUserId(userId);
     return rows.map(CVMapper.toDomain);
   }
 
@@ -37,9 +35,7 @@ export class CVService {
 
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.cvProfiles.findAll(
-          and(eq(cvProfiles.id, safeId), eq(cvProfiles.userId, userId))
-        )
+      ? await uow.cvProfiles.findByUserAndId(userId, safeId)
       : [];
 
     if (existing.length > 0) {

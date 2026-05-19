@@ -1,9 +1,17 @@
-import type { Snippet } from "../../types/tools";
-
 const now = Date.now();
-const id = (p: string, i: number) => `${p}_${i}`;
 
-export const seedSnippets: Snippet[] = [
+export interface SnippetSeed {
+  id: string;
+  title: string;
+  language: string;
+  description: string;
+  code: string;
+  tags: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export const seedSnippets: SnippetSeed[] = [
   {
     id: "s_1",
     title: "Drizzle ORM Connection",

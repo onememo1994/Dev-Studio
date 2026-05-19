@@ -1,10 +1,13 @@
 
 import { interviewQuestions, userProgress } from "../../domain/schema.js";
 import { eq, and, or } from "drizzle-orm";
-import { stripDates, isUUID } from "../../presentation/middleware/auth.js"; // In future, move to domain utils
+import { stripDates, isUUID } from "../../domain/utils.js";
 import { uow } from "../../infrastructure/repositories/drizzle-unit-of-work.js";
 
 export class InterviewService {
+  // NOTE: or(isGlobal, userId) is a domain-specific query that cannot be
+  // expressed through generic repository methods. This is an acceptable
+  // use of findAll(filter) until a dedicated InterviewRepository is created.
   static async getQuestions(userId: string) {
     return await uow.interviewQuestions.findAll(
       or(
@@ -19,7 +22,7 @@ export class InterviewService {
     const data = stripDates(raw);
     const safeId = isUUID(id) ? id : undefined;
     const existing = safeId
-      ? await uow.interviewQuestions.findAll(eq(interviewQuestions.id, safeId))
+      ? [await uow.interviewQuestions.findById(safeId)].filter(Boolean)
       : [];
 
     if (existing.length > 0 && existing[0].userId === userId) {
@@ -60,9 +63,11 @@ export class InterviewService {
   }
 
   static async getProgress(userId: string) {
-    return await uow.userProgress.findAll(eq(userProgress.userId, userId));
+    return await uow.userProgress.findByUserId(userId);
   }
 
+  // NOTE: toggleProgress uses a compound filter (userId + itemId) that is
+  // domain-specific. Keeping findAll/updateMany with drizzle filters for now.
   static async toggleProgress(
     userId: string,
     itemId: string,
@@ -90,3 +95,4 @@ export class InterviewService {
     }
   }
 }
+

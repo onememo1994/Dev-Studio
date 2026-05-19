@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import { requireUser } from "../middleware/auth.js";
+import { validateBody, validateParams } from "../middleware/validation.js";
 import { TemplatesService } from "../../application/services/templates.service.js";
+import { TemplateDto } from "../dtos/core.dto.js";
+import { z } from "zod";
+import { IdParamDto } from "../dtos/common.dto.js";
+
 
 export const getAll = async (req: Request, res: Response) => {
   const uid = requireUser(req, res);
@@ -50,7 +55,7 @@ export const deleteById = async (req: Request, res: Response) => {
 
 const router = Router();
 router.get("/", getAll);
-router.post("/", create);
-router.post("/bulk", createBulk);
-router.delete("/:id", deleteById);
+router.post("/", validateBody(TemplateDto), create);
+router.post("/bulk", validateBody(z.array(TemplateDto)), createBulk);
+router.delete("/:id", validateParams(IdParamDto), deleteById);
 export default router;
