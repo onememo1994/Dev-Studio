@@ -14,5 +14,13 @@
     "format:frontend": "npm run format --prefix frontend",
     "format:backend": "npm run format --prefix backend",
     "commitall": "git add . && git commit -m \"chore: auto commit from Dev Studio\" && git push"
+  },
+  "dependencies": {
+    "drizzle-zod": "^0.8.3",
+    "openai": "^6.39.0",
+    "p-limit": "^7.3.0",
+    "p-retry": "^7.1.1",
+    "zod": "^4.4.3",
+    "zod-validation-error": "^5.0.0"
   }
 }
